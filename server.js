@@ -1,47 +1,41 @@
 const express = require('express');
+const puppeteer = require('puppeteer');
 const cors = require('cors');
-const path = require('path');
-
 const app = express();
-app.use(cors());
-
-// Serve static frontend from /public
-app.use(express.static(path.join(__dirname, 'public')));
-
-// ====== تعديل المفتاح هنا إذا أردت ======
-const API_KEY = "8d9db8192762438d9f8b0ac4bf86475e";
-const SYMBOL = "2222.SR"; // سهم أرامكو
-
-app.get('/api/aramco', async (req, res) => {
-  try {
-    const url = `https://api.twelvedata.com/quote?symbol=${SYMBOL}&apikey=${API_KEY}`;
-    const response = await fetch(url, { timeout: 10000 });
-    const data = await response.json();
-
-    // شكل البيانات التي نعيدها للواجهة
-    const result = {
-      name: data.name || "Aramco",
-      symbol: SYMBOL,
-      price: data.close ?? null,
-      change: data.change ?? null,
-      percent_change: data.percent_change ?? null,
-      volume: data.volume ?? null,
-      timestamp: new Date().toISOString()
-    };
-
-    res.json(result);
-  } catch (err) {
-    console.error("Error fetching aramco:", err);
-    res.status(500).json({ error: "Failed to fetch aramco data" });
-  }
-});
-
-// fallback index (optional) - serve index.html for root
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
 
 const PORT = process.env.PORT || 3000;
+
+app.use(cors());
+app.use(express.static('public'));
+
+app.get('/api/aramco', async (req, res) => {
+    try {
+        const browser = await puppeteer.launch({ headless: true });
+        const page = await browser.newPage();
+        await page.goto('https://www.saudiexchange.sa/wps/portal/tadawul/market-watch/', {waitUntil: 'networkidle2'});
+
+        // جلب البيانات (هنا كمثال، تحتاج التحقق من Selector الصحيح)
+        const data = await page.evaluate(() => {
+            const row = document.querySelector('tr[data-symbol="2222.SR"]');
+            if (!row) return {};
+            const cells = row.querySelectorAll('td');
+            return {
+                name: 'أرامكو',
+                symbol: '2222.SR',
+                price: cells[2]?.innerText || 'N/A',
+                percent: cells[3]?.innerText || 'N/A',
+                signal: cells[3] && parseFloat(cells[3].innerText) > 0 ? '✅ دخول' : '❌ خروج'
+            };
+        });
+
+        await browser.close();
+        res.json(data);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to fetch data' });
+    }
+});
+
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });
