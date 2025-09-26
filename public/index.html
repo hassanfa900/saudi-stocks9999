@@ -1,35 +1,22 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar">
 <head>
-  <meta charset="UTF-8">
-  <title>📊 سوق الأسهم السعودي</title>
-  <style>
-    body { font-family: Tahoma, sans-serif; background: #f7f7f7; padding: 20px; }
-    h1 { text-align: center; }
-    table { width: 100%; border-collapse: collapse; background: white; }
-    th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-    th { background: #4CAF50; color: white; }
-    tr:nth-child(even) { background: #f2f2f2; }
-  </style>
+  <meta charset="UTF-8" />
+  <title>📊 بيانات الأسهم</title>
 </head>
 <body>
-  <h1>📊 إشارات الدخول والخروج للأسهم</h1>
-  <table id="stocks-table">
+  <h1>قائمة الأسهم</h1>
+  <table border="1" id="stocksTable">
     <thead>
       <tr>
-        <th>اسم الشركة</th>
         <th>الرمز</th>
-        <th>السعر الحالي</th>
-        <th>التغير %</th>
-        <th>السيولة (الحجم)</th>
-        <th>إشارة</th>
+        <th>الاسم</th>
+        <th>السعر</th>
+        <th>التغير</th>
       </tr>
     </thead>
-    <tbody>
-      <tr><td colspan="6">⏳ جاري تحميل البيانات...</td></tr>
-    </tbody>
+    <tbody></tbody>
   </table>
-
   <script src="script.js"></script>
 </body>
 </html>
