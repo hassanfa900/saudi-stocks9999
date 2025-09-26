@@ -1,23 +1,13 @@
-body {
-    font-family: Arial, sans-serif;
-    direction: rtl;
-    padding: 20px;
-    background: #f0f0f0;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: #fff;
-}
-
-th, td {
-    padding: 10px;
-    border: 1px solid #ccc;
-    text-align: center;
-}
-
-th {
-    background: #0077cc;
-    color: #fff;
-}
+:root { --bg:#f7f9fc; --card:#fff; --accent:#0b6fb5; --danger:#e14b4b; --ok:#1f8a3b; }
+* { box-sizing: border-box; }
+body { font-family: "Segoe UI", Tahoma, Arial; margin:0; background:var(--bg); color:#222; }
+main { max-width:900px; margin:28px auto; padding:18px; }
+h1 { text-align:center; margin-bottom:16px; }
+.card { background:var(--card); padding:12px 14px; border-radius:6px; box-shadow:0 1px 4px rgba(0,0,0,0.06); margin-bottom:14px; }
+.row { display:flex; gap:16px; justify-content:space-between; align-items:center; flex-wrap:wrap; }
+table { width:100%; border-collapse:collapse; background:var(--card); box-shadow:0 1px 6px rgba(0,0,0,0.06); }
+th, td { padding:12px 10px; border-bottom:1px solid #eee; text-align:center; }
+th { background:#f1f5f9; color:#333; }
+#signal.ok { color:var(--ok); font-weight:700; }
+#signal.warn { color:var(--danger); font-weight:700; }
+.foot { text-align:center; margin-top:10px; color:#666; }
