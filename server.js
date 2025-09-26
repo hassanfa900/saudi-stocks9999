@@ -1,19 +1,22 @@
-const express = require("express");
-const cors = require("cors");
-const { scrapeStocks } = require("./scraper");
+import express from "express";
+import cors from "cors";
+import { getAramcoData } from "./scraper.js";
 
 const app = express();
 app.use(cors());
 
-app.get("/api/stocks", async (req, res) => {
+// API endpoint لسهم أرامكو
+app.get("/api/aramco", async (req, res) => {
   try {
-    const data = await scrapeStocks();
+    const data = await getAramcoData();
     res.json(data);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Error fetching stock data");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to scrape Aramco data" });
   }
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
