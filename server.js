@@ -5,7 +5,6 @@ import { getAramcoData } from "./scraper.js";
 const app = express();
 app.use(cors());
 
-// API endpoint لسهم أرامكو
 app.get("/api/aramco", async (req, res) => {
   try {
     const data = await getAramcoData();
@@ -17,6 +16,4 @@ app.get("/api/aramco", async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
