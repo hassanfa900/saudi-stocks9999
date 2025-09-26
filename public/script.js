@@ -3,13 +3,16 @@ async function fetchAramco() {
         const res = await fetch('/api/aramco');
         const data = await res.json();
         const tbody = document.querySelector('#stock-table tbody');
+
         tbody.innerHTML = `
             <tr>
-                <td>${data.name || 'N/A'}</td>
-                <td>${data.symbol || 'N/A'}</td>
-                <td>${data.price || 'N/A'}</td>
-                <td>${data.percent || 'N/A'}</td>
-                <td>${data.signal || 'N/A'}</td>
+                <td>${data.name}</td>
+                <td>${data.symbol}</td>
+                <td>${data.price}</td>
+                <td>${data.change}</td>
+                <td>${data.percent}</td>
+                <td>${data.volume}</td>
+                <td>${data.signal}</td>
             </tr>
         `;
     } catch (err) {
