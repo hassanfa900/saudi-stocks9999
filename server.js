@@ -1,32 +1,43 @@
 import express from "express";
 import fetch from "node-fetch";
-import path from "path";
-import { fileURLToPath } from "url";
 
 const app = express();
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
-// يقدم index.html و script.js
-app.use(express.static(__dirname));
+// مفتاحك
+const API_KEY = "8d9db8192762438d9f8b0ac4bf86475e";
+
+// قائمة بالأسهم السعودية اللي تريد جلبها
+const symbols = ["2222.SR","7010.SR","1120.SR","2002.SR","1211.SR","1050.SR","2010.SR","2330.SR","3010.SR","4000.SR"];
 
 app.get("/api/stocks", async (req, res) => {
   try {
-    const symbols = "AAPL,MSFT,GOOG,AMZN,TSLA,META,NVDA,ORCL,IBM,INTC";
-    const apiKey = "8d9db8192762438d9f8b0ac4bf86475e"; // ✅ المفتاح الصحيح
-    const url = `https://api.twelvedata.com/quote?symbol=${symbols}&apikey=${apiKey}`;
+    const results = [];
 
-    const response = await fetch(url);
-    const data = await response.json();
+    for (const symbol of symbols) {
+      const url = `https://api.twelvedata.com/quote?symbol=${symbol}&apikey=${API_KEY}`;
+      const response = await fetch(url);
+      const data = await response.json();
 
-    res.json(data);
-  } catch (error) {
-    console.error("❌ خطأ في جلب البيانات:", error);
+      // حساب إشارة دخول/خروج مبسطة
+      const changePercent = parseFloat(data.percent_change) || 0;
+      const signal = changePercent > 0 ? "✅ دخول" : "❌ خروج";
+
+      results.push({
+        name: data.name || symbol,
+        symbol: symbol,
+        price: data.close || 0,
+        change: data.change || 0,
+        percent: data.percent_change || "0%",
+        signal: signal
+      });
+    }
+
+    res.json(results);
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "فشل في جلب البيانات" });
   }
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`🚀 السيرفر شغال على http://localhost:${PORT}`);
-});
+app.listen(PORT, () => console.log(`🚀 السيرفر شغال على http://localhost:${PORT}`));
