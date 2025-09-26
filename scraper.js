@@ -1,31 +1,33 @@
-const puppeteer = require("puppeteer");
+import puppeteer from "puppeteer";
 
-async function scrapeStocks() {
+export async function getAramcoData() {
   const browser = await puppeteer.launch({
     headless: "new",
-    args: ["--no-sandbox", "--disable-setuid-sandbox"]
+    args: ["--no-sandbox", "--disable-setuid-sandbox"],
   });
+
   const page = await browser.newPage();
 
-  await page.goto("https://www.saudiexchange.sa/wps/portal/saudiexchange/ourmarkets/main-market-watch");
+  // صفحة أرامكو في تداول
+  await page.goto("https://www.saudiexchange.sa/wps/portal/saudiexchange/ourmarkets/main-market-watch/company-details/2222", {
+    waitUntil: "networkidle2",
+  });
 
-  // مثال لجلب بيانات الأسهم
-  const stocks = await page.evaluate(() => {
-    const rows = Array.from(document.querySelectorAll("table tbody tr"));
-    return rows.map(row => {
-      const tds = row.querySelectorAll("td");
-      return {
-        symbol: tds[0]?.innerText.trim(),
-        name: tds[1]?.innerText.trim(),
-        price: tds[2]?.innerText.trim(),
-        change: tds[3]?.innerText.trim(),
-        volume: tds[4]?.innerText.trim()
-      };
-    });
+  // استخراج البيانات
+  const data = await page.evaluate(() => {
+    const getText = (selector) =>
+      document.querySelector(selector)?.innerText.trim() || "N/A";
+
+    return {
+      name: getText(".company-name"), // اسم الشركة
+      price: getText(".last-price"), // السعر الأخير
+      change: getText(".change"), // التغير
+      percent: getText(".change-percent"), // النسبة المئوية
+      volume: getText(".volume"), // الكمية المتداولة
+      value: getText(".value"), // السيولة
+    };
   });
 
   await browser.close();
-  return stocks;
+  return data;
 }
-
-module.exports = { scrapeStocks };
