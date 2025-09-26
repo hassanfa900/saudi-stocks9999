@@ -13,7 +13,7 @@ app.use(express.static(__dirname));
 app.get("/api/stocks", async (req, res) => {
   try {
     const symbols = "AAPL,MSFT,GOOG,AMZN,TSLA,META,NVDA,ORCL,IBM,INTC";
-    const apiKey = "8cde9bd31a70482ab1304d7f8bfaad72";
+    const apiKey = "8d9db8192762438d9f8b0ac4bf86475e"; // ✅ المفتاح الصحيح
     const url = `https://api.twelvedata.com/quote?symbol=${symbols}&apikey=${apiKey}`;
 
     const response = await fetch(url);
