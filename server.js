@@ -1,44 +1,49 @@
 const express = require('express');
-const puppeteer = require('puppeteer');
 const cors = require('cors');
+const fetch = require('node-fetch');
 
 const app = express();
 app.use(cors());
 
-app.get('/stocks', async (req, res) => {
+// مفتاح Twelve Data
+const API_KEY = "8cde9bd31a70482ab1304d7f8bfaad72";
+
+// رموز بعض الأسهم السعودية
+const symbols = [
+  "2222.SR", // أرامكو
+  "7010.SR", // STC
+  "1120.SR", // الراجحي
+  "1180.SR", // الأهلي
+  "2010.SR", // سابك
+  "1080.SR", // العربي الوطني
+  "1140.SR", // بنك البلاد
+  "2380.SR", // بترو رابغ
+  "4200.SR", // الدريس
+  "4003.SR"  // إكسترا
+];
+
+app.get('/api/stocks', async (req, res) => {
   try {
-    const browser = await puppeteer.launch({
-      headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
-    });
-    const page = await browser.newPage();
-
-    await page.goto(
-      'https://www.saudiexchange.sa/wps/portal/saudiexchange/ourmarkets/main-market-watch',
-      { waitUntil: 'networkidle2', timeout: 0 }
-    );
-
-    // 🔽 نسحب أول 10 أسطر فقط
-    const data = await page.evaluate(() => {
-      const rows = Array.from(document.querySelectorAll('table tbody tr')).slice(0, 10);
-      return rows.map(row => {
-        const cols = row.querySelectorAll('td');
-        return {
-          name: cols[0]?.innerText.trim() || 'N/A',
-          symbol: cols[1]?.innerText.trim() || 'N/A',
-          price: cols[2]?.innerText.trim() || 'N/A',
-          change: cols[3]?.innerText.trim() || 'N/A'
-        };
-      });
+    const promises = symbols.map(sym => {
+      return fetch(`https://api.twelvedata.com/quote?symbol=${sym}&apikey=${API_KEY}&source=docs`)
+        .then(r => r.json())
+        .then(data => ({
+          name: data.name || sym,
+          symbol: sym,
+          price: data.close,
+          change: data.percent_change,
+          volume: data.volume,
+          exchange: data.exchange
+        }));
     });
 
-    await browser.close();
-    res.json(data);
+    const stocks = await Promise.all(promises);
+    res.json(stocks);
   } catch (err) {
-    console.error('❌ Error fetching stock data:', err);
-    res.status(500).send('Error fetching stock data');
+    console.error("Error fetching via API:", err);
+    res.status(500).json({ error: "Failed to fetch stocks via API" });
   }
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
