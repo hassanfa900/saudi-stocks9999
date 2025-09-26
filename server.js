@@ -1,49 +1,36 @@
-const express = require('express');
-const cors = require('cors');
-const fetch = require('node-fetch');
+import express from "express";
+import fetch from "node-fetch";
+import path from "path";
+import { fileURLToPath } from "url";
 
 const app = express();
-app.use(cors());
 
-// مفتاح Twelve Data
-const API_KEY = "8cde9bd31a70482ab1304d7f8bfaad72";
+// لمعالجة __dirname مع ES Modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-// رموز بعض الأسهم السعودية
-const symbols = [
-  "2222.SR", // أرامكو
-  "7010.SR", // STC
-  "1120.SR", // الراجحي
-  "1180.SR", // الأهلي
-  "2010.SR", // سابك
-  "1080.SR", // العربي الوطني
-  "1140.SR", // بنك البلاد
-  "2380.SR", // بترو رابغ
-  "4200.SR", // الدريس
-  "4003.SR"  // إكسترا
-];
+// ✅ تقديم الملفات الثابتة (index.html + script.js)
+app.use(express.static(__dirname));
 
-app.get('/api/stocks', async (req, res) => {
+// ✅ API لجلب بيانات الأسهم
+app.get("/api/stocks", async (req, res) => {
   try {
-    const promises = symbols.map(sym => {
-      return fetch(`https://api.twelvedata.com/quote?symbol=${sym}&apikey=${API_KEY}&source=docs`)
-        .then(r => r.json())
-        .then(data => ({
-          name: data.name || sym,
-          symbol: sym,
-          price: data.close,
-          change: data.percent_change,
-          volume: data.volume,
-          exchange: data.exchange
-        }));
-    });
+    const symbols = "AAPL,MSFT,GOOG,AMZN,TSLA,META,NVDA,ORCL,IBM,INTC"; // 10 أسهم
+    const apiKey = "8cde9bd31a70482ab1304d7f8bfaad72"; // مفتاح Twelve Data
+    const url = `https://api.twelvedata.com/quote?symbol=${symbols}&apikey=${apiKey}`;
 
-    const stocks = await Promise.all(promises);
-    res.json(stocks);
-  } catch (err) {
-    console.error("Error fetching via API:", err);
-    res.status(500).json({ error: "Failed to fetch stocks via API" });
+    const response = await fetch(url);
+    const data = await response.json();
+
+    res.json(data);
+  } catch (error) {
+    console.error("❌ خطأ في جلب البيانات:", error);
+    res.status(500).json({ error: "فشل في جلب البيانات" });
   }
 });
 
+// ✅ تشغيل السيرفر
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`🚀 السيرفر شغال على http://localhost:${PORT}`);
+});
