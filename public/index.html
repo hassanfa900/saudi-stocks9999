@@ -1,31 +1,18 @@
-<!DOCTYPE html>
-<html lang="ar">
-<head>
-    <meta charset="UTF-8">
-    <title>سهم أرامكو</title>
-    <style>
-        table { border-collapse: collapse; width: 80%; margin: 20px auto; }
-        th, td { border: 1px solid #333; padding: 8px 12px; text-align: center; }
-        th { background-color: #f2f2f2; }
-    </style>
-</head>
-<body>
-    <h2 style="text-align:center;">إشارات الدخول والخروج لسهم أرامكو</h2>
-    <table id="stock-table">
-        <thead>
-            <tr>
-                <th>اسم الشركة</th>
-                <th>الرمز</th>
-                <th>السعر الحالي</th>
-                <th>التغير</th>
-                <th>النسبة %</th>
-                <th>الحجم</th>
-                <th>إشارة</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-
-    <script src="script.js"></script>
-</body>
-</html>
+<table border="1">
+  <thead>
+    <tr>
+      <th>الاسم</th>
+      <th>الرمز</th>
+      <th>السعر الحالي</th>
+      <th>التغير</th>
+      <th>الحجم</th>
+      <th>EMA 9</th>
+      <th>EMA 20</th>
+      <th>RSI</th>
+      <th>MACD</th>
+      <th>MFI</th>
+      <th>إشارة الدخول</th>
+    </tr>
+  </thead>
+  <tbody id="stock-data"></tbody>
+</table>
