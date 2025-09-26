@@ -1,20 +1,26 @@
-fetch('/api/stocks')
-  .then(res => res.json())
-  .then(data => {
-    const table = document.getElementById('stocks-table').querySelector('tbody');
-    table.innerHTML = "";
+async function fetchStocks() {
+  try {
+    const response = await fetch("/api/stocks");
+    const data = await response.json();
 
-    data.forEach(stock => {
-      const row = table.insertRow();
-      row.insertCell(0).innerText = stock.name;
-      row.insertCell(1).innerText = stock.symbol;
-      row.insertCell(2).innerText = stock.price;
-      row.insertCell(3).innerText = stock.change + '%';
-      row.insertCell(4).innerText = stock.volume;
+    const tbody = document.querySelector("#stocksTable tbody");
+    tbody.innerHTML = "";
 
-      // إشارة دخول/خروج بناءً على التغير
-      const signal = (stock.change >= 0 ? "✅ دخول" : "❌ خروج");
-      row.insertCell(5).innerText = signal;
-    });
-  })
-  .catch(err => console.error("Error:", err));
+    for (let symbol in data) {
+      if (data[symbol].symbol) {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${data[symbol].symbol}</td>
+          <td>${data[symbol].name}</td>
+          <td>${data[symbol].price}</td>
+          <td>${data[symbol].change}</td>
+        `;
+        tbody.appendChild(row);
+      }
+    }
+  } catch (err) {
+    console.error("❌ خطأ في جلب البيانات:", err);
+  }
+}
+
+fetchStocks();
